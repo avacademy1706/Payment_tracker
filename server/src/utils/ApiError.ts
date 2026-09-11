@@ -1,0 +1,31 @@
+export class ApiError extends Error {
+  statusCode: number;
+  errors?: Record<string, string>;
+
+  constructor(statusCode: number, message: string, errors?: Record<string, string>) {
+    super(message);
+    this.name = "ApiError";
+    this.statusCode = statusCode;
+    this.errors = errors;
+  }
+
+  static badRequest(message: string, errors?: Record<string, string>) {
+    return new ApiError(400, message, errors);
+  }
+
+  static unauthorized(message = "Not authenticated.") {
+    return new ApiError(401, message);
+  }
+
+  static forbidden(message = "Not authorized.") {
+    return new ApiError(403, message);
+  }
+
+  static notFound(message = "Resource not found.") {
+    return new ApiError(404, message);
+  }
+
+  static conflict(message: string, errors?: Record<string, string>) {
+    return new ApiError(409, message, errors);
+  }
+}
