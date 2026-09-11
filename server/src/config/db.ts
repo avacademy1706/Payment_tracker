@@ -12,6 +12,12 @@ let memoryServerHandle: { stop: () => Promise<unknown> } | null = null;
  * deployments must set MONGODB_URI to a real database.
  */
 export async function connectDatabase(): Promise<void> {
+  // Idempotent: in a serverless runtime (Vercel), the module holding this
+  // connection is cached and reused across warm invocations of the same
+  // function instance, so this can be called on every request without
+  // opening a new connection each time.
+  if (mongoose.connection.readyState === 1) return;
+
   let uri = env.mongodbUri;
 
   if (!uri) {
