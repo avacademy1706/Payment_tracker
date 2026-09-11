@@ -1,3 +1,4 @@
+// Standalone entry point for any regular Node host (not Vercel — see server/src/vercel.ts for that).
 import { createApp } from "./app";
 import { connectDatabase, disconnectDatabase, isUsingAutoProvisionedDatabase } from "./config/db";
 import { env } from "./config/env";
