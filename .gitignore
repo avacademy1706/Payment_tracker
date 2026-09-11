@@ -11,3 +11,7 @@ coverage/
 *.tsbuildinfo
 .mongomemoryserver/
 .vercel/
+
+# Kept locally for your own reference/editing, not published to GitHub.
+Client_Monthly_Payment_Record.xlsx
+Claude Code — Full-Stack Payment Tracker Master Prompt.md
