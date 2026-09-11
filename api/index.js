@@ -1978,11 +1978,22 @@ async function getApp() {
       await connectDatabase();
       await bootstrapEssentials();
       return createApp();
-    })();
+    })().catch((err) => {
+      appPromise = null;
+      throw err;
+    });
   }
   return appPromise;
 }
 async function handler(req, res) {
-  const app = await getApp();
-  app(req, res);
+  try {
+    const app = await getApp();
+    app(req, res);
+  } catch (err) {
+    console.error("[vercel] Failed to initialize app:", err);
+    const message = err instanceof Error ? err.message : "Unknown startup error";
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ success: false, message: `Server failed to start: ${message}` }));
+  }
 }
