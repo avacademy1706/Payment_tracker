@@ -10,10 +10,10 @@ Monorepo with four parts:
 /client   React 18 + TypeScript + Vite SPA (Tailwind CSS, shadcn/ui-style components, TanStack Query, React Hook Form + Zod, Recharts)
 /server   Node.js + TypeScript + Express REST API (Mongoose/MongoDB, JWT auth via httpOnly cookie)
 /shared   Plain TypeScript types (enums, domain interfaces, API envelope) imported by both client and server via relative paths — no build step, no package boundary
-/api      A single committed, pre-bundled file (index.cjs) that adapts the Express app in /server for Vercel's serverless runtime — see §6
+/api      A single committed, pre-bundled file (index.js) that adapts the Express app in /server for Vercel's serverless runtime — see §6
 ```
 
-Locally, and on any regular Node host, the API runs as one long-lived process (`server/src/server.ts`, `app.listen(...)`). On Vercel, the same Express app (`server/src/app.ts#createApp`) is instead invoked per-request as a serverless function — but Vercel's own per-file Node builder doesn't reliably trace this project's multi-file, extensionless-relative-import structure (it fails at runtime with `Cannot find module '/var/task/server/src/app'`), so `server/src/vercel.ts` is bundled by `tsup` into one self-contained CommonJS file with zero remaining local imports, output straight to `api/index.cjs` and **committed to git** — that file, not Vercel's own tracer, is what actually gets deployed. No route code is duplicated between the two entry points; the bundle is just a build artifact of the same `server/src/app.ts`.
+Locally, and on any regular Node host, the API runs as one long-lived process (`server/src/server.ts`, `app.listen(...)`). On Vercel, the same Express app (`server/src/app.ts#createApp`) is instead invoked per-request as a serverless function — but Vercel's own per-file Node builder doesn't reliably trace this project's multi-file, extensionless-relative-import structure (it fails at runtime with `Cannot find module '/var/task/server/src/app'`), so `server/src/vercel.ts` is bundled by `tsup` into one self-contained CommonJS file with zero remaining local imports, output straight to `api/index.js` and **committed to git** — that file, not Vercel's own tracer, is what actually gets deployed. No route code is duplicated between the two entry points; the bundle is just a build artifact of the same `server/src/app.ts`.
 
 Key design decisions:
 
@@ -126,13 +126,13 @@ Copy `.env.example` → `.env` in `server/` (and `client/` if you need to overri
 The frontend and API deploy together as **one Vercel project**, same origin (no CORS, cookies just work):
 
 - `client/` builds to static files Vercel serves directly.
-- `api/index.cjs` — a pre-bundled, committed build artifact (see §1) — runs as the serverless function; `vercel.json` rewrites every `/api/*` request to it, and everything else to the SPA (`index.html`), so client-side routes (e.g. `/clients`) survive a hard refresh.
+- `api/index.js` — a pre-bundled, committed build artifact (see §1) — runs as the serverless function; `vercel.json` rewrites every `/api/*` request to it, and everything else to the SPA (`index.html`), so client-side routes (e.g. `/clients`) survive a hard refresh.
 
 **If you ever change anything under `server/src/` or `shared/` and deploy to Vercel, rebuild and commit the bundle first:**
 
 ```bash
-npm run build -w server   # regenerates api/index.cjs (and server/dist/, for the non-Vercel path)
-git add api/index.cjs
+npm run build -w server   # regenerates api/index.js (and server/dist/, for the non-Vercel path)
+git add api/index.js
 git commit -m "Rebuild Vercel function bundle"
 git push
 ```
@@ -211,7 +211,7 @@ This account is created automatically the first time the server starts against a
 
 ## 10. Known Limitations
 
-- **The Vercel function bundle (`api/index.cjs`) is a committed build artifact, not generated on the fly.** Vercel's own zero-config Node builder can't reliably trace this project's multi-file server code (see §1), so `server/src/vercel.ts` is pre-bundled with `tsup` and the output is checked into git. Forgetting to rebuild+commit it after a backend change means Vercel deploys stale API code — see the rebuild command in §6.
+- **The Vercel function bundle (`api/index.js`) is a committed build artifact, not generated on the fly.** Vercel's own zero-config Node builder can't reliably trace this project's multi-file server code (see §1), so `server/src/vercel.ts` is pre-bundled with `tsup` and the output is checked into git. Forgetting to rebuild+commit it after a backend change means Vercel deploys stale API code — see the rebuild command in §6.
 - **Dev-tooling CVEs, not shipped to production:** `npm audit` flags Vite/Vitest dev-server vulnerabilities that would require a major-version bump (Vite 5→8, Vitest 2→5) to clear; these only affect the local dev/test tooling, not the deployed app, and weren't worth the churn late in this build.
 - **Excel parsing uses SheetJS's own patched build, not the npm registry package.** `xlsx` on npm is frozen at an old version with known prototype-pollution/ReDoS CVEs; SheetJS ships real fixes only via their own CDN (`server/package.json` pins `xlsx` to `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` — a widely-used, SheetJS-recommended workaround for this exact situation). An `exceljs`-based alternative was tried first but crashes on workbooks saved as an Excel Table (`Insert > Table`), which is how `Client_Monthly_Payment_Record.xlsx` itself is formatted — there's a regression test for this exact case in `server/tests/integration/excelImport.integration.test.ts`.
 - **Reminders open pre-filled links, not sent automatically** (per the spec — WhatsApp/email links, no messaging API integration).

@@ -31,12 +31,16 @@ export default defineConfig([
     target: "node20",
     platform: "node",
     outDir: "../api",
-    // The repo root's package.json declares "type": "module", which would
-    // make Node treat a plain api/index.js as an ES module and choke on
-    // this CommonJS bundle's `require`/`module.exports`. The .cjs extension
-    // forces CommonJS regardless of that setting; Vercel's Node builder
-    // supports it as a function entry the same as .js.
-    outExtension: () => ({ js: ".cjs" }),
+    // Plain .js on purpose, not .cjs: Vercel's zero-config function
+    // detection is documented and proven for .js entries — .cjs is a much
+    // less common convention for it and isn't worth the risk. This is only
+    // safe because the repo root's package.json has no "type": "module"
+    // (removed for exactly this reason) — Node treats api/index.js as
+    // CommonJS by default, matching this bundle's require()/module.exports.
+    // tsup defaults CJS output to .cjs when the SOURCE package (server/,
+    // which is "type": "module") looks ESM, regardless of where the file
+    // ends up — override that explicitly.
+    outExtension: () => ({ js: ".js" }),
     splitting: false,
     sourcemap: false,
     clean: false,
