@@ -1,3 +1,4 @@
+import * as React from "react";
 import { formatCurrency, formatDate, billingMonthLabel } from "@/lib/utils";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import type { BusinessSettings, Invoice, InvoiceClientRef, Payment } from "@shared/types";
@@ -9,11 +10,14 @@ interface InvoicePrintViewProps {
   settings?: BusinessSettings;
 }
 
-export function InvoicePrintView({ invoice, payments, settings }: InvoicePrintViewProps) {
+export const InvoicePrintView = React.forwardRef<HTMLDivElement, InvoicePrintViewProps>(function InvoicePrintView(
+  { invoice, payments, settings },
+  ref
+) {
   const client = invoice.client as InvoiceClientRef;
 
   return (
-    <div className="mx-auto max-w-2xl bg-white p-8 text-sm text-slate-900 print:p-0">
+    <div ref={ref} className="mx-auto max-w-2xl bg-white p-8 text-sm text-slate-900 print:p-0">
       <div className="flex items-start justify-between border-b pb-6">
         <div className="flex items-center gap-3">
           <img src={plexusLogo} alt="Plexus Digitals" className="h-14 w-14 shrink-0 object-contain" />
@@ -123,4 +127,4 @@ export function InvoicePrintView({ invoice, payments, settings }: InvoicePrintVi
       )}
     </div>
   );
-}
+});
