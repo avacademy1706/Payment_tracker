@@ -1,15 +1,13 @@
 import { NavLink } from "react-router-dom";
-import { Wallet } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/nav";
 import { cn } from "@/lib/utils";
+import plexusLogo from "@/assets/plexus-logo.png";
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-14 items-center gap-2 border-b px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-          <Wallet className="h-4 w-4" />
-        </div>
+        <img src={plexusLogo} alt="Plexus Digitals" className="h-9 w-9 shrink-0 object-contain" />
         <span className="text-sm font-semibold tracking-tight">Payment Tracker</span>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">

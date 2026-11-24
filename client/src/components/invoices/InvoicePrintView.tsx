@@ -1,6 +1,7 @@
 import { formatCurrency, formatDate, billingMonthLabel } from "@/lib/utils";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import type { BusinessSettings, Invoice, InvoiceClientRef, Payment } from "@shared/types";
+import plexusLogo from "@/assets/plexus-logo.png";
 
 interface InvoicePrintViewProps {
   invoice: Invoice;
@@ -15,9 +16,7 @@ export function InvoicePrintView({ invoice, payments, settings }: InvoicePrintVi
     <div className="mx-auto max-w-2xl bg-white p-8 text-sm text-slate-900 print:p-0">
       <div className="flex items-start justify-between border-b pb-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-900 text-lg font-semibold text-white">
-            {settings?.businessName?.[0] ?? "B"}
-          </div>
+          <img src={plexusLogo} alt="Plexus Digitals" className="h-14 w-14 shrink-0 object-contain" />
           <div>
             <p className="text-base font-semibold">{settings?.businessName ?? "Your Business"}</p>
             {settings?.businessAddress && <p className="max-w-[220px] text-xs text-slate-500">{settings.businessAddress}</p>}

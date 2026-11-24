@@ -3,13 +3,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { Wallet, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { getErrorMessage } from "@/lib/api";
+import plexusLogo from "@/assets/plexus-logo.png";
 
 const schema = z.object({
   email: z.string().min(1, "Email is required.").email("Enter a valid email address."),
@@ -48,9 +49,7 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Wallet className="h-5 w-5" />
-          </div>
+          <img src={plexusLogo} alt="Plexus Digitals" className="mb-2 h-16 w-16 object-contain" />
           <CardTitle>Payment Tracker</CardTitle>
           <CardDescription>Sign in to manage clients, invoices and payments.</CardDescription>
         </CardHeader>
